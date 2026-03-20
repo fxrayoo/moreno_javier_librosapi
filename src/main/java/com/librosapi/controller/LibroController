@@ -1,0 +1,49 @@
+package com.librosapi.controller;
+
+import com.librosapi.model.Libro;
+import com.librosapi.service.LibroService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/libros")
+public class LibroController {
+
+    @Autowired
+    private LibroService service;
+
+    @GetMapping
+    public List<Libro> obtenerTodos() {
+        return service.listarTodos();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Libro> obtenerPorId(@PathVariable Long id) {
+        return service.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public Libro crear(@RequestBody Libro libro) {
+        return service.guardar(libro);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Libro> actualizar(@PathVariable Long id, @RequestBody Libro libro) {
+        return service.actualizar(id, libro)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        if (service.eliminar(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+}
